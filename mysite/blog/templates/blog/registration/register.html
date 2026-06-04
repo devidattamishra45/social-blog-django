@@ -1,0 +1,24 @@
+{% extends "blog/base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="auth-card">
+  <h1>Register</h1>
+  <p class="auth-subtitle">Join our social platform to write posts, customize your profile, and share your ideas.</p>
+
+  <form method="post" action="{% url 'blog:register' %}">
+    {% csrf_token %}
+    <div class="form-group">
+      {{ form.as_p }}
+    </div>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">Create Account</button>
+    </div>
+  </form>
+
+  <div class="auth-footer">
+    <p>Already have an account? <a href="{% url 'blog:login' %}">Log In</a></p>
+  </div>
+</div>
+{% endblock %}

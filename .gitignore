@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+my_env/
+venv/
+env/
+.venv/
+
+# Local databases
+*.sqlite3
+
+# Local media uploads
+mysite/media/
+
+# Environment configurations (contains email passwords, secret keys)
+.env
+
+# Editor settings
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp

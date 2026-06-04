@@ -1,0 +1,57 @@
+{% extends "blog/base.html" %}
+
+{% block title %}My Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h1>My Dashboard</h1>
+    <a href="{% url 'blog:post_create' %}" class="btn btn-primary">Write New Post</a>
+  </div>
+
+  <p class="dashboard-subtitle">Manage your drafts and published articles from one location.</p>
+
+  <div class="dashboard-card">
+    {% if posts %}
+      <div class="table-responsive">
+        <table class="dashboard-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Date Created</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for post in posts %}
+              <tr>
+                <td class="post-title-cell">
+                  <a href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                </td>
+                <td>{{ post.created|date:"M j, Y" }}</td>
+                <td>
+                  {% if post.status == 'PB' %}
+                    <span class="status-badge status-published">Published</span>
+                  {% else %}
+                    <span class="status-badge status-draft">Draft</span>
+                  {% endif %}
+                </td>
+                <td class="action-buttons-cell">
+                  <a href="{% url 'blog:post_edit' post.id %}" class="btn btn-xs btn-outline">Edit</a>
+                  <a href="{% url 'blog:post_delete' post.id %}" class="btn btn-xs btn-danger">Delete</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-dashboard-state">
+        <p>You haven't written any posts yet. Let's share your first story!</p>
+        <a href="{% url 'blog:post_create' %}" class="btn btn-primary">Create Your First Post</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

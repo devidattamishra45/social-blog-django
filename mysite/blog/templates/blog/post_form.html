@@ -1,0 +1,78 @@
+{% extends "blog/base.html" %}
+
+{% block title %}{{ action }} Post{% endblock %}
+
+{% block content %}
+<div class="form-card">
+  <h1>{{ action }} Post</h1>
+  <p class="form-subtitle">Share your ideas with the world. You can write your post body using Markdown formatting.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+      {{ form.as_p }}
+    </div>
+
+    <!-- Live Markdown Preview (premium feature!) -->
+    <div class="markdown-preview-section">
+      <h3>Live Preview</h3>
+      <div id="markdown-preview-box" class="post-body markdown-preview-box"></div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        {% if action == 'Create' %}Publish / Save{% else %}Save Changes{% endif %}
+      </button>
+      <a href="{% url 'blog:dashboard_view' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<!-- Client-side markdown preview script -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const bodyTextarea = document.querySelector("textarea[name='body']");
+    const previewBox = document.getElementById("markdown-preview-box");
+    
+    if (bodyTextarea && previewBox) {
+      function updatePreview() {
+        let text = bodyTextarea.value;
+        if (!text) {
+          previewBox.innerHTML = "<p class='text-muted' style='font-style: italic;'>Start typing to see live preview...</p>";
+          return;
+        }
+        
+        // Escape HTML tags to prevent XSS in preview
+        let html = text
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+          
+        // Convert headers (e.g. # Header)
+        html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+        html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+        html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+        
+        // Bold
+        html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Italics
+        html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Inline Code
+        html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+        
+        // Paragraphs
+        html = html.split('\n\n').map(p => {
+          return '<p>' + p.replace(/\n/g, '<br>') + '</p>';
+        }).join('');
+        
+        previewBox.innerHTML = html;
+      }
+      
+      bodyTextarea.addEventListener("input", updatePreview);
+      updatePreview(); // Initial render
+    }
+  });
+</script>
+{% endblock %}

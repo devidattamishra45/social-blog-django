@@ -1,0 +1,83 @@
+{% extends "blog/base.html" %}
+{% load blog_tags %}
+
+{% block title %}{{ profile_user.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="profile-card">
+  <div class="profile-header">
+    <div class="profile-avatar-container">
+      {% if profile_user.profile.avatar %}
+        <img src="{{ profile_user.profile.avatar.url }}" alt="{{ profile_user.username }}" class="profile-avatar">
+      {% else %}
+        <div class="profile-avatar-placeholder">
+          {{ profile_user.username|slice:":1"|upper }}
+        </div>
+      {% endif %}
+    </div>
+    
+    <div class="profile-info">
+      <h1 class="profile-name">
+        {% if profile_user.first_name or profile_user.last_name %}
+          {{ profile_user.first_name }} {{ profile_user.last_name }}
+        {% else %}
+          {{ profile_user.username }}
+        {% endif %}
+      </h1>
+      <p class="profile-username">@{{ profile_user.username }}</p>
+      
+      {% if profile_user == request.user %}
+        <a href="{% url 'blog:profile_edit' %}" class="btn btn-outline">Edit Profile</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="profile-body">
+    {% if profile_user.profile.bio %}
+      <div class="profile-bio">
+        <h3>About</h3>
+        <p>{{ profile_user.profile.bio }}</p>
+      </div>
+    {% else %}
+      {% if profile_user == request.user %}
+        <div class="profile-bio empty">
+          <p>You haven't written a bio yet. <a href="{% url 'blog:profile_edit' %}">Add one now!</a></p>
+        </div>
+      {% endif %}
+    {% endif %}
+
+    <div class="profile-stats">
+      <div class="stat-item">
+        <span class="stat-value">{{ posts.count }}</span>
+        <span class="stat-label">Published Posts</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="profile-posts-section">
+  <h2 class="section-title">Articles by {{ profile_user.username }}</h2>
+  {% for post in posts %}
+    <div class="post-card">
+      <h2>
+        <a href="{{ post.get_absolute_url }}">
+          {{ post.title }}
+        </a>
+      </h2>
+      <p class="date">
+        Published {{ post.publish|date:"N j, Y" }}
+      </p>
+      <p class="tags">
+        {% for tag in post.tags.all %}
+          <a href="{% url "blog:post_list_by_tag" tag.slug %}">
+            {{ tag.name }}
+          </a>
+        {% endfor %}
+      </p>
+      {{ post.body|markdown|truncatewords_html:30 }}
+    </div>
+  {% empty %}
+    <p class="empty-message">No published articles yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}
